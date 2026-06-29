@@ -1,11 +1,38 @@
-*.iml
-.gradle
-/local.properties
-.idea
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+webapp/server/dist/
+webapp/web/dist/
+**/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-.kotlin
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Trae IDE workspace
+.trae/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache

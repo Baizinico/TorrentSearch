@@ -1,0 +1,37 @@
+services:
+  torrentsearch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: torrentsearch-web:latest
+    container_name: torrentsearch
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # 端口（与 Dockerfile 默认值一致）
+      - PORT=3000
+      - NODE_ENV=production
+      # 如需使用 FlareSolverr 解锁 Cloudflare 源，可在设置页填写或在下方注入
+      # - FLARESOLVERR_URL=http://flaresolverr:8191
+    # 反向代理后端时建议保留：
+    # - 信任 X-Forwarded-* 头已在 server/src/index.ts 中设置 trust proxy=1
+    networks:
+      - default
+
+  # 可选：FlareSolverr 用于解锁 Cloudflare 保护的源
+  # 取消注释并在 web UI 设置中填写 http://flaresolverr:8191
+  # flaresolverr:
+  #   image: ghcr.io/flaresolverr/flaresolverr:latest
+  #   container_name: flaresolverr
+  #   restart: unless-stopped
+  #   environment:
+  #     - LOG_LEVEL=info
+  #   ports:
+  #     - "8191:8191"
+  #   networks:
+  #     - default
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,30 @@
+{
+  "name": "torrentsearch-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TorrentSearch Web 版 — 30+ 源并发种子聚合搜索（React + Node.js）",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:web": "npm --workspace web run dev",
+    "build": "npm run build:web && npm run build:server",
+    "build:server": "npm --workspace server run build",
+    "build:web": "npm --workspace web run build",
+    "start": "cross-env NODE_ENV=production node server/dist/index.js",
+    "lint": "eslint \"server/src/**/*.{ts,tsx}\" \"web/src/**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,css,md,json}\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

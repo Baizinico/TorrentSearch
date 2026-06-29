@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* 暗色主题变量（默认） */
+    --bg-base: #0e1116;
+    --bg-card: #161b22;
+    --bg-hover: #1c232c;
+    --bg-subtle: #11161d;
+    --fg: #e6edf3;
+    --fg-muted: #8b949e;
+    --fg-subtle: #6e7681;
+    --border: #21262d;
+    --border-strong: #30363d;
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+    /* 亮色主题变量 */
+    --bg-base: #f6f8fa;
+    --bg-card: #ffffff;
+    --bg-hover: #eaeef2;
+    --bg-subtle: #f0f3f6;
+    --fg: #1f2328;
+    --fg-muted: #59636e;
+    --fg-subtle: #818b98;
+    --border: #d0d7de;
+    --border-strong: #afb8c1;
+  }
+
+  html.pure-black.dark body {
+    background-color: #000;
+  }
+  html.pure-black.dark .bg-bg-base {
+    background-color: #000 !important;
+  }
+
+  body {
+    @apply bg-bg-base text-fg font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* 滚动条 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-strong rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-fg-subtle;
+  }
+
+  /* 焦点可见 */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg-base;
+  }
+}
+
+@layer components {
+  /* 卡片 */
+  .card {
+    @apply bg-bg-card border border-border rounded-card;
+  }
+  .card-hover {
+    @apply transition-colors hover:bg-bg-hover hover:border-border-strong;
+  }
+  /* 按钮 */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-btn
+      font-medium text-sm transition-colors disabled:opacity-50
+      disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-black hover:bg-accent-hover;
+  }
+  .btn-secondary {
+    @apply btn bg-bg-hover text-fg hover:bg-border-strong border border-border;
+  }
+  .btn-ghost {
+    @apply btn text-fg-muted hover:text-fg hover:bg-bg-hover;
+  }
+  /* 输入框 */
+  .input {
+    @apply bg-bg-subtle border border-border rounded-input px-3 py-2
+      text-fg placeholder:text-fg-subtle focus:border-accent
+      focus:ring-1 focus:ring-accent outline-none transition-colors;
+  }
+  /* 徽章 */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs
+      font-medium;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

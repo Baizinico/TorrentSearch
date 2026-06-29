@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/.cache
+.git
+.gitignore
+*.log
+.trae
+.vscode
+.idea

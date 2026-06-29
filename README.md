@@ -1,209 +1,139 @@
 <div align="center">
 
-![TorrentSearch icon](https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/icon.png)
+# TorrentSearch Web
 
-<h1>Torrent Search</h1>
-<br/>
+**自托管种子聚合搜索 · Web 版**
 
-[![Latest release](https://img.shields.io/github/v/release/prajwalch/TorrentSearch?style=for-the-badge&color=green)](https://github.com/prajwalch/TorrentSearch/releases)
-[![F-Droid](https://img.shields.io/f-droid/v/com.prajwalch.torrentsearch?style=for-the-badge&color=blue)](https://f-droid.org/packages/com.prajwalch.torrentsearch)
-[![IzzyOnDroid](https://img.shields.io/endpoint?style=for-the-badge&color=skyblue&url=https://apt.izzysoft.de/fdroid/api/v1/shield/com.prajwalch.torrentsearch)](https://apt.izzysoft.de/fdroid/index/apk/com.prajwalch.torrentsearch)
-[![Downloads](https://img.shields.io/github/downloads/prajwalch/TorrentSearch/total?style=for-the-badge&color=lightgreen)](https://github.com/prajwalch/TorrentSearch/releases)
-[![Translation status](https://img.shields.io/weblate/progress/torrentsearch?style=for-the-badge)](https://hosted.weblate.org/engage/torrentsearch/)
+一次查询，全网种子，即搜即得。
 
 </div>
 
-## Table of Contents
+> **Origin**: 本项目是 [`prajwalch/TorrentSearch`](https://github.com/prajwalch/TorrentSearch)（Android / Kotlin / Jetpack Compose 原生应用）的 Web 分支，使用 React + Node.js 完全重写，保留原项目的全部 34 个内置 provider 与 Torznab 兼容能力，并重新设计了流式 UI 与浏览器本地持久化方案。感谢原作者 [@prajwalch](https://github.com/prajwalch) 的工作。
 
-- [Intro](#intro)
-- [Download](#download)
-- [Features](#features)
-   * [Search](#search)
-   * [Detailed Results](#detailed-results)
-   * [Torrent Actions](#torrent-actions)
-   * [Torrent Details](#torrent-details)
-   * [Browse](#browse)
-   * [Bookmarks](#bookmarks)
-   * [Safe Mode](#safe-mode)
-   * [Integrations](#integrations)
-   * [Material 3 Design](#material-3-design)
-- [Screenshots](#screenshots)
-- [Building from Source](#building-from-source)
-   * [Command Line](#command-line)
-- [Contributing](#contributing)
-   * [Translation](#translation)
-- [Contributors](#contributors)
-- [Tech Stack and Open Source Libraries](#tech-stack-and-open-source-libraries)
-- [Acknowledgements](#acknowledgements)
-- [Disclaimer](#disclaimer)
+## 特性
 
-## Intro
+- **35 个源**：34 内置 provider + 任意数量的 Torznab 索引器（Jackett / Prowlarr 兼容）
+- **SSE 流式搜索**：每个 provider 完成即推送，结果按完成顺序追加，无需等待全部源
+- **类别过滤**：All / Anime / Apps / Books / Games / Movies / Music / Porn / Series / Other
+- **浏览模式**：latest / top 双 tab，按类别与 provider 过滤
+- **详情页**：海报、截图、描述（Markdown）、magnet / .torrent 下载、原页面跳转
+- **Cloudflare 解锁**：通过 FlareSolverr 适配 6 个 CF 保护的源
+- **本地持久化**：书签、已浏览标记、Torznab 配置、主题、Provider 启用状态全部通过 localStorage 本地保存，无需数据库
+- **暗色 / 亮色双主题**：琥珀金 + 青蓝 + 炭灰配色，支持纯黑 OLED 模式
+- **响应式**：桌面左侧导航，移动端底部 tab bar
+- **单进程一体化**：生产模式 Node 托管前端静态资源，单端口访问
+- **Docker 部署**：多阶段构建，开箱即用
 
-TorrentSearch is an Android app for searching torrents across multiple providers simultaneously,
-with fast search speed, detailed results, category filters, and a full set of torrent actions.
+## 技术栈
 
-## Download
+- **Monorepo**：npm workspaces（`server/` + `web/`）
+- **后端**：Node.js 20+ / Express 4 / axios / cheerio / fast-xml-parser / tough-cookie / zod / p-limit
+- **前端**：React 18 / Vite 5 / TypeScript 5 / Tailwind CSS 3 / React Router 6 / Zustand 4（persist）/ TanStack Query / @tanstack/react-virtual / lucide-react / react-markdown / dayjs
 
-> [!NOTE]
-> TorrentSearch requires Android 7.1 or newer.
->
-> Nightly builds are available in the artifacts section of GitHub
-> [Actions](https://github.com/prajwalch/TorrentSearch/actions) workflow runs.
-> They are generated automatically for each commit and may be unstable.
+## 快速开始
 
-[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/com.prajwalch.torrentsearch)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" alt="Get it on IzzyOnDroid" height="80">](https://apt.izzysoft.de/fdroid/index/apk/com.prajwalch.torrentsearch)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/prajwalch/TorrentSearch/releases/latest/)
-[<img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/badge_obtainium.png" alt="Get it on Obtainium" height="55">](https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/prajwalch/TorrentSearch/)
+### 开发模式
 
-## Features
-
-### Search
-
-- Query all providers simultaneously, with per-provider enable/disable toggles
-- Search by category: `Anime`, `Apps`, `Books`, `Games`, `Movies`, `Series`, and more
-- Results are shown progressively as providers respond
-- Sort by `torrent name`, `seeders`, `peers`, `file size`, or `upload date`
-- Filter out dead or already-viewed torrents
-- Filter results by name, provider or category
-
-### Detailed Results
-
-Each result includes:
-
-- Torrent name
-- File size
-- Seeders and peers
-- Upload date
-- Category
-- NSFW indicator
-- Provider name
-
-### Torrent Actions
-
-- **Open magnet link** in an external torrent client
-- **Download `.torrent` file** to local storage
-- **View torrent details** directly inside the app or open the full page in your browser
-- **Copy or share** the magnet link or details page URL
-
-If no torrent client is installed, TorrentSearch provides links to FOSS torrent clients.
-
-### Torrent Details
-
-- **Native details screen** — view torrent details inside the app without a browser or WebView; can
-  be disabled to open the page directly in your default browser instead
-- Media poster with automatic NSFW image blurring (can be disabled)
-- Screenshot previews
-- Full description with inline image support
-
-### Browse
-
-- Explore **top** and **latest** torrents from your enabled providers
-- Filter by category and sort order — changing either instantly refreshes results
-- Filter out dead or already-viewed torrents
-- Filter torrents by name or provider
-
-### Bookmarks
-
-- Save torrents for later
-- Export and import bookmarks
-
-### Safe Mode
-
-When enabled, Safe Mode automatically:
-
-- Disables unsafe and NSFW providers
-- Hides NSFW categories and torrents
-
-### Integrations
-
-Connect your own indexer via the [Torznab API](https://torznab.github.io/spec-1.3-draft/torznab/Specification-v1.3.html#torznab-api-specification):
-
-- [Jackett](https://github.com/Jackett/Jackett)
-- [Prowlarr](https://github.com/Prowlarr/Prowlarr)
-- Other *arr services
-
-See the [wiki](https://github.com/prajwalch/TorrentSearch/wiki) for setup instructions.
-
-### Material 3 Design
-
-- Clean, easy-to-use interface
-- Adapts to your wallpaper and system theme, with full light/dark mode support
-
-## Screenshots
-
-<img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_1.jpg" alt="Home screen"> <img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_2.jpg" alt="Search screen"> <img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_3.jpg" alt="Torrent actions"> <img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_4.jpg" alt="Bookmarks screen">
-<br>
-<img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_5.jpg" alt="Browse screen"> <img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_6.jpg" alt="Torrent details screen"> <img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_7.jpg" alt="Settings screen">
-<img width="23%" src="https://github.com/prajwalch/TorrentSearch/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_8.jpg" alt="Search providers screen">
-
-## Building from Source
-
-The easiest way is to open the project in [Android Studio](https://developer.android.com/studio) — 
-it handles all setup and lets you run the app in a single click.
-
-### Command Line
-
-**Requirements:**
-
-- JDK 17+ with `JAVA_HOME` set ([Adoptium](https://adoptium.net/) recommended)
-- Android SDK — version depends on project configuration. If you have Android Studio installed, it
-  has already downloaded, set up, and configured the SDK location for you. Otherwise, install it
-  manually and set `ANDROID_HOME`, or add `sdk.dir` to `local.properties` in the project root.
-
-```sh
-git clone https://github.com/prajwalch/TorrentSearch.git
-cd TorrentSearch
-./gradlew assembleDebug
+```bash
+cd webapp
+npm install
+npm run dev
 ```
 
-Output: `app/build/outputs/apk/debug/`
+- 前端：http://localhost:5173 （Vite dev server）
+- 后端：http://localhost:3001 （Express，自动代理 `/api`）
 
-## Contributing
+### 生产模式
 
-Bug fixes, new providers, UI improvements, and translations are all welcome.
-Read [CONTRIBUTING.md](https://github.com/prajwalch/TorrentSearch/blob/main/CONTRIBUTING.md) before
-opening a pull request.
+```bash
+cd webapp
+npm install
+npm run build    # 编译前后端
+npm start        # 单端口 :3000 托管 API + 静态资源
+```
 
-### Translation
+访问 http://localhost:3000 即可。
 
-Translations are managed on [Weblate](https://hosted.weblate.org/projects/torrentsearch/) — 
-no local setup needed, contribute directly from your browser.
+### Docker 部署
 
-[![Translation status](https://hosted.weblate.org/widget/torrentsearch/multi-auto.svg)](https://hosted.weblate.org/engage/torrentsearch/)
+```bash
+cd webapp
+docker compose up --build -d
+```
 
-## Contributors
+可选：取消 `docker-compose.yml` 中的 `flaresolverr` 服务注释以解锁 Cloudflare 保护的源。
 
-<a href="https://github.com/prajwalch/TorrentSearch/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=prajwalch/TorrentSearch" alt="TorrentSearch Contributors"/>
-</a>
+## 项目结构
 
-## Tech Stack and Open Source Libraries
+```
+webapp/
+├── server/                  # 后端 — Express + Provider 体系
+│   ├── src/
+│   │   ├── providers/       # 34 个内置 provider + Torznab + 基类与注册表
+│   │   ├── gateway/         # 并发调度 + AsyncGenerator 流式聚合
+│   │   ├── http/            # HttpClient + FlareSolverr 适配
+│   │   ├── routes/          # /api/search /browse /details /providers /torznab /trackers
+│   │   ├── config.ts
+│   │   ├── index.ts         # Express 入口（生产 SPA fallback）
+│   │   └── types.ts
+│   └── package.json
+├── web/                     # 前端 — React + Vite + Tailwind
+│   ├── src/
+│   │   ├── components/      # search / torrent / ui 三层组件
+│   │   ├── hooks/           # useSearchStream / useBrowseStream / useProviders / useTheme / useTorrentDetails
+│   │   ├── layouts/         # RootLayout（左侧导航 + 移动端 tab bar）
+│   │   ├── lib/             # api / torrent-utils
+│   │   ├── pages/           # Home / Search / Browse / Details / Bookmarks / Settings / Providers / TorznabEdit / NotFound
+│   │   ├── stores/          # bookmarks / settings / torznab / viewed（Zustand + persist）
+│   │   ├── App.tsx          # 路由树
+│   │   ├── index.css        # Tailwind + CSS 变量主题
+│   │   └── types.ts
+│   ├── index.html
+│   ├── tailwind.config.ts
+│   ├── vite.config.ts
+│   └── package.json
+├── Dockerfile               # 多阶段构建
+├── docker-compose.yml
+└── package.json             # monorepo 根
+```
 
-- **Language:** [Kotlin](https://kotlinlang.org/)
-- **UI:** [Jetpack Compose](https://developer.android.com/compose), [Material 3](https://m3.material.io/)
-- **Architecture:** [Modern App Architecture](https://developer.android.com/topic/architecture)
-- **Async:** [Coroutines](https://kotlinlang.org/docs/coroutines-overview.html), [Flow](https://kotlinlang.org/docs/flow.html)
-- **Networking:** [Ktor](https://ktor.io/)
-- **Storage:** [Room](https://developer.android.com/training/data-storage/room), [Jetpack DataStore](https://developer.android.com/topic/libraries/architecture/datastore)
-- **Dependency injection:** [Hilt](https://developer.android.com/training/dependency-injection/hilt-android)
-- **Image loading:** [Coil](https://coil-kt.github.io/coil/)
-- **HTML parsing**: [Jsoup](https://github.com/jhy/jsoup)
-- **Immutable collections**: [Kotlinx immutable collections](https://github.com/Kotlin/kotlinx.collections.immutable)
-- **Markdown rendering**: [ComposeMarkdown](https://github.com/jeziellago/compose-markdown)
-- **Scrollbar**: [LazyColumnScrollbar](https://github.com/nanihadesuka/LazyColumnScrollbar)
-- **Image Blurring**: [BlurTransformation](https://github.com/T8RIN/BlurTransformation)
+## API 速览
 
-## Acknowledgements
+| 路径 | 方法 | 说明 |
+|---|---|---|
+| `/api/health` | GET | 健康检查 |
+| `/api/providers` | GET | 列出全部内置 provider（id / name / url / 类别 / capabilities） |
+| `/api/search` | POST | SSE 流式搜索，按 provider 完成顺序推送 `batch` / `failure` / `done` 事件 |
+| `/api/browse/latest` | POST | SSE 流式 latest 列表 |
+| `/api/browse/top` | POST | SSE 流式 top 列表 |
+| `/api/details` | GET | 抓取单个 torrent 详情（需 `url` / `provider`） |
+| `/api/torznab/check` | POST | 检测 Torznab 索引器连接 |
+| `/api/trackers` | GET | 返回推荐 tracker 列表（用于组装 magnet） |
 
-- [IconKitchen](https://icon.kitchen/) — app icon
-- [Metrolist](https://github.com/MetrolistGroup/Metrolist) and [Canta](https://github.com/samolego/Canta) — referenced for architecture and implementation
-  patterns during development
+所有 POST 请求体为 JSON，详见 [`webapp/server/src/types.ts`](webapp/server/src/types.ts) 中的 `SearchRequest` / `BrowseRequest`。
 
-## Disclaimer
+## 隐私
 
-TorrentSearch **does not host, store, or distribute any torrent files or copyrighted content**.
-It searches publicly accessible third-party sources and displays the results. The developer is not
-responsible for how those results are accessed or used.
+- 不内置任何账号系统、不上报任何遥测
+- 书签、已浏览标记、设置、Torznab 配置全部保存在浏览器 localStorage
+- 后端仅作为 provider 抓取代理，不持久化任何用户数据
 
-Users are responsible for complying with their local laws and regulations.
+## 与上游的差异
+
+| 维度 | 上游 `prajwalch/TorrentSearch` | 本分支 `web-version` |
+|---|---|---|
+| 平台 | Android 原生 | Web（自托管） |
+| 语言 | Kotlin | TypeScript |
+| UI | Jetpack Compose / Material 3 | React + Tailwind CSS |
+| 状态 | ViewModel + Room | Zustand persist + TanStack Query |
+| 持久化 | Room（SQLite） | localStorage |
+| Provider 体系 | 34 内置 + Torznab | 34 内置 + Torznab（移植保留） |
+| 流式渲染 | Flow | SSE + AsyncGenerator |
+| CF 解锁 | — | FlareSolverr 适配 |
+| 部署 | APK / F-Droid | Node 单进程 / Docker |
+
+## License
+
+MIT © Prajwal Chapagain（原作者）— 见 [LICENSE](LICENSE)。
+
+本分支延续 MIT 协议，欢迎继续二次开发与自托管部署。
