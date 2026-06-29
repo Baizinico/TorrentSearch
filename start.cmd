@@ -1,72 +1,78 @@
 @echo off
-chcp 65001 >nul
-REM TorrentSearch Web 一键启动脚本（Windows）
-REM 用法：双击或命令行执行 start.cmd [dev|prod|build]
-REM   无参数 = dev 开发模式
-REM   prod   = 生产模式（先 build 再 start）
-REM   build  = 仅构建
+REM TorrentSearch Web one-click startup script (Windows)
+REM Usage: double-click or run: start.cmd [dev|prod|build]
+REM   no arg = dev mode
+REM   prod   = production mode (build then start)
+REM   build  = build only
 
 setlocal
 cd /d "%~dp0webapp"
 if errorlevel 1 (
-  echo [错误] 未找到 webapp 目录
+  echo [ERROR] webapp directory not found
   pause
   exit /b 1
 )
 
-REM 检查 Node.js
+REM Check Node.js
 where node >nul 2>nul
 if errorlevel 1 (
-  echo [错误] 未检测到 Node.js，请安装 Node.js 20+ 后重试。
-  echo        下载：https://nodejs.org/
+  echo [ERROR] Node.js not found. Please install Node.js 20+.
+  echo         Download: https://nodejs.org/
   pause
   exit /b 1
 )
 
-REM 检查依赖
+REM Install dependencies on first run
 if not exist "node_modules" (
-  echo [信息] 首次运行，正在安装依赖...
+  echo [INFO] First run, installing dependencies...
   call npm install
   if errorlevel 1 (
-    echo [错误] 依赖安装失败
+    echo [ERROR] Dependency installation failed
     pause
     exit /b 1
   )
 )
 
-REM 分发参数
+REM Pick mode
 set "MODE=%1"
 if "%MODE%"=="" set "MODE=dev"
 
 if /i "%MODE%"=="dev" (
-  echo [启动] 开发模式（前端 :5173 / 后端 :3001）
+  echo [START] Dev mode (frontend :5173 / backend :3001)
   call npm run dev
   goto :end
 )
 
 if /i "%MODE%"=="build" (
-  echo [构建] 生产构建...
+  echo [BUILD] Production build...
   call npm run build
+  if errorlevel 1 (
+    echo [ERROR] Build failed
+    pause
+    exit /b 1
+  )
+  echo [OK] Build complete.
   goto :end
 )
 
 if /i "%MODE%"=="prod" (
-  echo [构建] 生产构建...
+  echo [BUILD] Production build...
   call npm run build
   if errorlevel 1 (
-    echo [错误] 构建失败
+    echo [ERROR] Build failed
     pause
     exit /b 1
   )
-  echo [启动] 生产模式（单端口 :3000）
+  echo [START] Production mode (single port :3000)
   call npm start
   goto :end
 )
 
-echo [错误] 未知参数：%MODE%
-echo 用法：start.cmd [dev^|prod^|build]
-pause
-exit /b 1
+echo [ERROR] Unknown argument: %MODE%
+echo Usage: start.cmd [dev^|prod^|build]
 
 :end
+echo.
+echo [INFO] Script finished. Press any key to close this window.
+pause >nul
 endlocal
